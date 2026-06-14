@@ -398,12 +398,12 @@ export default function OptimisePage() {
               </div>
 
               {/* Off-screen targets for PDF generation */}
-              <div className="absolute -left-[10000px] -top-[10000px]">
+              <div className="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none">
                 <div className="w-[210mm] bg-white">
                   <CVPreview data={cvData} templateStyle={templateStyle} printRef={cvPrintRef} />
                 </div>
               </div>
-              <div className="absolute -left-[10000px] -top-[10000px]">
+              <div className="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none">
                 <div className="w-[210mm] bg-white">
                   <CoverLetterPreview
                     data={coverLetterData}
