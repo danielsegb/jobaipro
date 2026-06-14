@@ -233,7 +233,7 @@ export function AnalysisResults({
             Ready to generate your documents?
           </h4>
           <p className="text-sm text-slate-500">
-            Let Google Gemini optimize your CV and generate a custom cover letter.
+            Let our AI optimize your CV and generate a custom cover letter.
           </p>
         </div>
 

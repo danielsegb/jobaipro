@@ -15,7 +15,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Job AI Pro | Tailor your CV and cover letter in minutes",
-  description: "Optimise your CV and generate tailored cover letters using Google Gemini AI. Ensure ATS keyword compatibility and download professional templates.",
+  description: "Optimise your CV and generate tailored cover letters using AI. Ensure ATS keyword compatibility and download professional templates.",
 };
 
 export default function Home() {

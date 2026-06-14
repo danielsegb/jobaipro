@@ -33,25 +33,14 @@ export function JobDescriptionForm({
   isLoading
 }: JobDescriptionFormProps) {
 
-  const loadSample = () => {
-    setJobTitle(sampleJobDescription.jobTitle);
-    setCompanyName(sampleJobDescription.companyName);
-    setIndustry(sampleJobDescription.industry);
-    setDescription(sampleJobDescription.description);
-  };
+
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Step 2: Target Job Details</h2>
           <p className="text-sm text-slate-500 mt-1">Provide the details of the job you are targeting for optimal matching.</p>
         </div>
-        <Button variant="outline" size="sm" onClick={loadSample} className="self-start sm:self-center">
-          <Clipboard className="w-4 h-4 mr-2" />
-          Load Sample Job Description
-        </Button>
-      </div>
 
       {/* Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

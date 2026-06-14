@@ -15,7 +15,7 @@ export function HeroSection() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold tracking-wide border border-blue-100/50 animate-fade-in">
             <Sparkles className="w-3.5 h-3.5 fill-current" />
-            Powered by Google Gemini 2.5 Flash
+            Powered by AI
           </div>
 
           {/* Heading */}

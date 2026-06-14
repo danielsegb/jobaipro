@@ -13,7 +13,7 @@ export function HowItWorks() {
       num: "02",
       icon: FileSpreadsheet,
       title: "Paste a job description",
-      description: "Provide the details of the job you are targeting. Gemini will analyze the requirements and extract critical keywords.",
+      description: "Provide the details of the job you are targeting. Our AI will analyze the requirements and extract critical keywords.",
       color: "bg-indigo-50 text-indigo-600 border-indigo-100",
     },
     {

@@ -27,14 +27,6 @@ export function Navbar() {
           <Link href="/optimise?step=1" className="hover:text-slate-900 transition-colors">
             Upload
           </Link>
-          <a
-            href="https://github.com/danielsegb/jobaipro"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-slate-900 transition-colors"
-          >
-            GitHub
-          </a>
         </nav>
 
         {/* CTA Button */}

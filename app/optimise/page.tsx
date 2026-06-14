@@ -295,7 +295,7 @@ export default function OptimisePage() {
                 <ErrorMessage message={generationError} onRetry={isGeneratingCV ? handleOptimiseCV : handleGenerateCoverLetter} />
               )}
               {(isGeneratingCV || isGeneratingCL) && (
-                <LoadingState type="cv" message={isGeneratingCV ? "Gemini is optimising your CV" : "Gemini is writing your cover letter"} />
+                <LoadingState type="cv" message={isGeneratingCV ? "AI is optimising your CV" : "AI is writing your cover letter"} />
               )}
               {!isGeneratingCV && !isGeneratingCL && (
                 <AnalysisResults
@@ -312,7 +312,7 @@ export default function OptimisePage() {
           {/* Step 4: Editor & Preview */}
           {step === 4 && (
             <div className="space-y-6">
-              {/* Gemini badge */}
+              {/* AI badge */}
               <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-4 py-2.5 rounded-xl w-fit">
                 <Sparkles className="w-4 h-4 fill-current" />
                 Your AI-tailored documents are ready to edit and download.
@@ -377,7 +377,7 @@ export default function OptimisePage() {
                   {activeEditorTab === "cover-letter" && (
                     <>
                       {isGeneratingCL ? (
-                        <LoadingState type="cv" message="Gemini is writing your cover letter" />
+                        <LoadingState type="cv" message="AI is writing your cover letter" />
                       ) : (
                         <CoverLetterEditor
                           data={coverLetterData}

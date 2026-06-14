@@ -19,7 +19,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-slate-500 max-w-sm leading-relaxed">
-              Create highly tailored, ATS-friendly CVs and cover letters customized for any job description in minutes using Google Gemini AI.
+              Create highly tailored, ATS-friendly CVs and cover letters customized for any job description in minutes using AI.
             </p>
           </div>
 
@@ -49,16 +49,7 @@ export function Footer() {
           <div>
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Resources</h4>
             <ul className="space-y-2.5 text-sm">
-              <li>
-                <a
-                  href="https://github.com/danielsegb/jobaipro"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-slate-600 hover:text-blue-600 transition-colors"
-                >
-                  GitHub Repository
-                </a>
-              </li>
+
               <li>
                 <span className="text-slate-400 cursor-not-allowed">Privacy Policy</span>
               </li>
@@ -71,7 +62,9 @@ export function Footer() {
 
         {/* Bottom Panel */}
         <div className="mt-12 pt-8 border-t border-slate-200/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© {currentYear} Job AI Pro. All rights reserved. Built with Google Gemini API.</p>
+          <p>
+            © 2026 Job AI Pro. All rights reserved. Built by <a href="https://danielse.com/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors font-medium">DANIELSE</a>
+          </p>
           <p>Designed for professional excellence.</p>
         </div>
       </div>

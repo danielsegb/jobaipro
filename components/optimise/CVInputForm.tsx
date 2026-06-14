@@ -15,6 +15,7 @@ const SAMPLE_CV_TEXT = ``;
 export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
   const [dragActive, setDragActive] = React.useState(false);
   const [fileNotice, setFileNotice] = React.useState<{ type: "info" | "error"; message: string } | null>(null);
+  const [isParsing, setIsParsing] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -44,7 +45,7 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
     e.target.value = "";
   };
 
-  const processFile = (file: File) => {
+  const processFile = async (file: File) => {
     setFileNotice(null);
     const ext = file.name.split(".").pop()?.toLowerCase();
 
@@ -65,14 +66,40 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
       };
       reader.readAsText(file, "UTF-8");
     } else if (ext === "pdf" || ext === "docx" || ext === "doc") {
-      // PDF/DOCX cannot be parsed in the browser without heavy libraries.
-      // Clear any existing text and prompt the user to copy-paste.
-      setFileNotice({
-        type: "info",
-        message: `PDF and Word documents cannot be read directly in the browser. Please open "${file.name}", select all text (Ctrl+A), copy it (Ctrl+C), then paste it into the text area below.`,
-      });
+      setIsParsing(true);
+      setFileNotice({ type: "info", message: `Parsing "${file.name}"... Please wait.` });
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/parse-document", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to parse document");
+        }
+
+        const data = await response.json();
+        
+        if (data.text && data.text.trim()) {
+          setCvText(data.text);
+          setFileNotice({ type: "info", message: `✓ "${file.name}" loaded successfully. Review and edit below if needed.` });
+        } else {
+          throw new Error("Empty document");
+        }
+      } catch (error) {
+        console.error(error);
+        setFileNotice({
+          type: "error",
+          message: `Could not extract text automatically from "${file.name}". Please open the document, copy all text, and paste it into the text area below.`,
+        });
+      } finally {
+        setIsParsing(false);
+      }
     } else {
-      setFileNotice({ type: "error", message: "Unsupported file type. Please upload a .txt file or paste your CV text directly below." });
+      setFileNotice({ type: "error", message: "Unsupported file type. Please upload a .pdf, .docx, or .txt file, or paste your CV text directly below." });
     }
   };
 
@@ -102,6 +129,7 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
           onChange={handleFileChange}
           accept=".pdf,.docx,.doc,.txt"
           className="hidden"
+          disabled={isParsing}
         />
         <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
           <Upload className="w-6 h-6" />
@@ -143,6 +171,7 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
           placeholder="Paste your CV content here... Include your name, contact details, work history, education, and skills."
           rows={14}
           className="font-sans leading-relaxed text-sm focus:ring-blue-500/10 focus:border-blue-500"
+          disabled={isParsing}
         />
         {cvText && (
           <p className="text-xs text-slate-400 text-right">
@@ -154,7 +183,7 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
       {/* Action */}
       <div className="flex justify-end pt-4">
         <Button
-          disabled={!cvText.trim()}
+          disabled={!cvText.trim() || isParsing}
           onClick={onNext}
           className="px-8"
         >

@@ -128,7 +128,7 @@ export function CVEditor({ data, onChange, jobDescription, onRewriteSection, isR
               className="text-blue-600 border-blue-100 hover:bg-blue-50"
             >
               <Wand2 className="w-3.5 h-3.5 mr-1.5 text-blue-500" />
-              AI Rewrite with Gemini
+              AI Rewrite
             </Button>
           )}
         </div>
@@ -261,7 +261,7 @@ export function CVEditor({ data, onChange, jobDescription, onRewriteSection, isR
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Link (Optional)</label>
-                  <Input value={proj.link || ""} onChange={e => updateProj(idx, "link", e.target.value)} placeholder="github.com/username/project" />
+                  <Input value={proj.link || ""} onChange={e => updateProj(idx, "link", e.target.value)} placeholder="example.com/project" />
                 </div>
               </div>
               <div className="space-y-1">

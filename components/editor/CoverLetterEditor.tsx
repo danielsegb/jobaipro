@@ -73,7 +73,7 @@ export function CoverLetterEditor({ data, onChange, onRewrite, isRewriting }: Co
               className="text-blue-600 border-blue-100 hover:bg-blue-50"
             >
               <Wand2 className="w-3.5 h-3.5 mr-1.5 text-blue-500" />
-              Regenerate with Gemini
+              Regenerate with AI
             </Button>
           )}
         </div>
