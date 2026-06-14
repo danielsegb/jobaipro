@@ -385,29 +385,32 @@ export default function OptimisePage() {
                   <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider">Live Preview</h3>
 
                   {activeEditorTab === "cv" && (
-                    <CVPreview data={cvData} templateStyle={templateStyle} printRef={cvPrintRef} />
+                    <CVPreview data={cvData} templateStyle={templateStyle} />
                   )}
 
                   {activeEditorTab === "cover-letter" && (
                     <CoverLetterPreview
                       data={coverLetterData}
-                      printRef={clPrintRef}
                       candidateName={cvData.fullName}
                     />
                   )}
                 </div>
               </div>
 
-              {/* Hidden print targets */}
-              <div className="hidden print:block">
-                <CVPreview data={cvData} templateStyle={templateStyle} printRef={cvPrintRef} />
+              {/* Off-screen targets for PDF generation */}
+              <div className="absolute -left-[10000px] -top-[10000px]">
+                <div className="w-[210mm] bg-white">
+                  <CVPreview data={cvData} templateStyle={templateStyle} printRef={cvPrintRef} />
+                </div>
               </div>
-              <div className="hidden print:block">
-                <CoverLetterPreview
-                  data={coverLetterData}
-                  printRef={clPrintRef}
-                  candidateName={cvData.fullName}
-                />
+              <div className="absolute -left-[10000px] -top-[10000px]">
+                <div className="w-[210mm] bg-white">
+                  <CoverLetterPreview
+                    data={coverLetterData}
+                    printRef={clPrintRef}
+                    candidateName={cvData.fullName}
+                  />
+                </div>
               </div>
             </div>
           )}
