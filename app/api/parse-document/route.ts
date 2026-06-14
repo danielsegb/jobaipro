@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth";
-
-if (typeof global.DOMMatrix === 'undefined') {
-  (global as any).DOMMatrix = class DOMMatrix {};
-}
-if (typeof global.ImageData === 'undefined') {
-  (global as any).ImageData = class ImageData {};
-}
-if (typeof global.Path2D === 'undefined') {
-  (global as any).Path2D = class Path2D {};
-}
-
-const pdfParse = require("pdf-parse");
+import PDFParser from "pdf2json";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,8 +17,12 @@ export async function POST(req: NextRequest) {
     const ext = file.name.split(".").pop()?.toLowerCase();
 
     if (ext === "pdf" || file.type === "application/pdf") {
-      const data = await pdfParse(buffer);
-      extractedText = data.text;
+      extractedText = await new Promise((resolve, reject) => {
+        const pdfParser = new (PDFParser as any)(null, 1);
+        pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
+        pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
+        pdfParser.parseBuffer(buffer);
+      }) as string;
     } else if (
       ext === "docx" ||
       ext === "doc" ||
