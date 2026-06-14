@@ -36,7 +36,7 @@ export function CoverLetterPreview({ data, printRef, candidateName }: CoverLette
         <div className="space-y-4 text-justify">
           {data.content
             ? data.content.split("\n\n").filter(Boolean).map((para, idx) => (
-                <p key={idx} className="leading-relaxed">{para.trim()}</p>
+                <p key={idx} className="leading-relaxed whitespace-pre-line">{para.trim()}</p>
               ))
             : (
               <p className="text-slate-400 italic">
@@ -45,14 +45,6 @@ export function CoverLetterPreview({ data, printRef, candidateName }: CoverLette
             )
           }
         </div>
-
-        {/* Signature */}
-        {candidateName && (
-          <div className="mt-10 space-y-1">
-            <p className="text-slate-700">Yours sincerely,</p>
-            <p className="font-bold text-slate-900 text-base">{candidateName}</p>
-          </div>
-        )}
       </div>
     </div>
   );

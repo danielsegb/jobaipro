@@ -25,7 +25,7 @@ import {
   CoverLetterData,
   TemplateStyle,
 } from "@/lib/types";
-import { sampleCVData, sampleCoverLetter } from "@/lib/sampleData";
+import { sampleCVData } from "@/lib/sampleData";
 import { parseRawCVText } from "@/lib/cvParser";
 
 type Step = 1 | 2 | 3 | 4;
@@ -55,7 +55,13 @@ export default function OptimisePage() {
 
   // Generated documents state
   const [cvData, setCvData] = React.useState<CVData>(sampleCVData);
-  const [coverLetterData, setCoverLetterData] = React.useState<CoverLetterData>(sampleCoverLetter);
+  const [coverLetterData, setCoverLetterData] = React.useState<CoverLetterData>({
+    recipient: "Hiring Manager",
+    companyName: "",
+    jobTitle: "",
+    content: "",
+    tone: "professional",
+  });
   const [isGeneratingCV, setIsGeneratingCV] = React.useState(false);
   const [isGeneratingCL, setIsGeneratingCL] = React.useState(false);
   const [isRewritingSection, setIsRewritingSection] = React.useState(false);
@@ -147,8 +153,9 @@ export default function OptimisePage() {
         setCoverLetterData(prev => ({
           ...prev,
           content: json.coverLetter,
-          companyName: companyName || prev.companyName,
-          jobTitle: jobTitle || prev.jobTitle,
+          // Always overwrite with the user's actual inputs from Step 2
+          companyName: companyName,
+          jobTitle: jobTitle,
         }));
         // Switch to cover letter tab if not already
         setActiveEditorTab("cover-letter");
