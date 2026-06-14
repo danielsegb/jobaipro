@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Upload, Clipboard, AlertCircle, FileText } from "lucide-react";
+import { Upload, AlertCircle, FileText } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Textarea } from "../ui/Textarea";
 
@@ -9,38 +9,8 @@ export interface CVInputFormProps {
   onNext: () => void;
 }
 
-const SAMPLE_CV_TEXT = `Alexander Sterling
-Email: alexander.sterling@email.co.uk | Phone: +44 7700 900077 | Location: London, UK
-LinkedIn: linkedin.com/in/alexandersterling | Portfolio: alexandersterling.dev
+const SAMPLE_CV_TEXT = ``;
 
-PROFESSIONAL SUMMARY
-Results-driven Software Engineering Manager with over 8 years of experience leading cross-functional teams to deliver scalable web applications. Expert in React, Next.js, Node.js, and cloud architecture.
-
-KEY SKILLS
-JavaScript (ES6+), TypeScript, React, Next.js, Node.js, Express.js, GraphQL, PostgreSQL, MongoDB, AWS (S3, EC2, Lambda), CI/CD, Agile
-
-PROFESSIONAL EXPERIENCE
-Lead Software Engineer | InnovateTech Solutions Ltd (2022-03 to Present)
-- Lead a high-performing team of 6 engineers developing an enterprise SaaS platform.
-- Architected and migrated the legacy frontend codebase to Next.js, improving load times by 42%.
-- Reduced page loading speed by 42% through code-splitting and server-side rendering optimisations.
-
-Senior Frontend Developer | CloudCommerce Partners (2019-06 to 2022-02)
-- Developed and maintained highly responsive React-based e-commerce applications.
-- Rebuilt check-out flow, boosting conversion rates by 8.5%.
-- Mentored junior developers and conducted constructive code reviews.
-
-EDUCATION
-MSc in Advanced Computer Science | University of Manchester (2017 - 2018)
-Graduated with Distinction. Focused on distributed systems and machine learning.
-
-BSc (Hons) in Software Engineering | University of Bristol (2014 - 2017)
-First Class Honours. Awarded Best Capstone Project.
-
-CERTIFICATIONS
-AWS Certified Solutions Architect – Associate (2023)
-Certified ScrumMaster (CSM) – Scrum Alliance (2021)
-`;
 
 export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
   const [dragActive, setDragActive] = React.useState(false);
@@ -108,15 +78,9 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">Step 1: Upload or paste your CV</h2>
-          <p className="text-sm text-slate-500 mt-1">Provide the current version of your CV to establish your background.</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={() => { setCvText(SAMPLE_CV_TEXT); setFileNotice(null); }} className="self-start sm:self-center">
-          <Clipboard className="w-4 h-4 mr-2" />
-          Load Sample CV
-        </Button>
+      <div>
+        <h2 className="text-xl font-bold text-slate-900">Step 1: Upload or paste your CV</h2>
+        <p className="text-sm text-slate-500 mt-1">Provide the current version of your CV to establish your background.</p>
       </div>
 
       {/* Drag & Drop Upload Zone */}
