@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import { CheckCircle2, Sparkles } from "lucide-react";
 
 import { Navbar } from "@/components/layout/Navbar";
@@ -75,17 +74,6 @@ export default function OptimisePage() {
   // Print refs
   const cvPrintRef = useRef<HTMLDivElement>(null);
   const clPrintRef = useRef<HTMLDivElement>(null);
-
-  // Print handlers
-  const handlePrintCV = useReactToPrint({
-    contentRef: cvPrintRef,
-    documentTitle: `CV - ${cvData.fullName || "Job AI Pro"}`,
-  });
-
-  const handlePrintCL = useReactToPrint({
-    contentRef: clPrintRef,
-    documentTitle: `Cover Letter - ${cvData.fullName || "Job AI Pro"}`,
-  });
 
   // Step 2 → 3: Analyse CV
   const handleAnalyse = async () => {
@@ -323,8 +311,10 @@ export default function OptimisePage() {
 
               {/* Download buttons */}
               <DownloadButtons
-                onPrintCV={handlePrintCV}
-                onPrintCL={handlePrintCL}
+                cvData={cvData}
+                coverLetterData={coverLetterData.content ? coverLetterData : undefined}
+                cvRef={cvPrintRef}
+                clRef={clPrintRef}
                 hasCL={!!coverLetterData.content}
                 onSaveDraft={handleSaveDraft}
                 draftSaved={draftSaved}
