@@ -70,6 +70,32 @@ export default function OptimisePage() {
   const [templateStyle, setTemplateStyle] = React.useState<TemplateStyle>("classic");
   const [activeEditorTab, setActiveEditorTab] = React.useState<"cv" | "cover-letter">("cv");
   const [draftSaved, setDraftSaved] = React.useState(false);
+  const [hasDraft, setHasDraft] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedCV = localStorage.getItem("jobaipro_cv_draft");
+      if (savedCV) {
+        setHasDraft(true);
+      }
+    }
+  }, []);
+
+  const handleLoadDraft = () => {
+    try {
+      const savedCV = localStorage.getItem("jobaipro_cv_draft");
+      const savedCL = localStorage.getItem("jobaipro_cl_draft");
+      if (savedCV) {
+        setCvData(JSON.parse(savedCV));
+      }
+      if (savedCL) {
+        setCoverLetterData(JSON.parse(savedCL));
+      }
+      setStep(4);
+    } catch (err) {
+      console.error("Failed to load draft:", err);
+    }
+  };
 
   // Print refs
   const cvPrintRef = useRef<HTMLDivElement>(null);
@@ -238,12 +264,34 @@ export default function OptimisePage() {
 
           {/* Step 1: CV Input */}
           {step === 1 && (
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
-              <CVInputForm
-                cvText={cvText}
-                setCvText={setCvText}
-                onNext={() => setStep(2)}
-              />
+            <div className="max-w-3xl mx-auto space-y-6">
+              {hasDraft && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4.5 bg-blue-50 border border-blue-100 rounded-2xl text-sm text-blue-900 shadow-sm animate-fade-in">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-600 shrink-0">
+                      <Sparkles className="w-4.5 h-4.5 fill-current" />
+                    </div>
+                    <div>
+                      <p className="font-bold">Resume your last session?</p>
+                      <p className="text-xs text-blue-600/80 mt-0.5">We found a saved draft of your CV and cover letter in this browser.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLoadDraft}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm hover:shadow-blue-600/10 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    Resume Draft
+                  </button>
+                </div>
+              )}
+
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
+                <CVInputForm
+                  cvText={cvText}
+                  setCvText={setCvText}
+                  onNext={() => setStep(2)}
+                />
+              </div>
             </div>
           )}
 
