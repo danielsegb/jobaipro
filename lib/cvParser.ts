@@ -74,7 +74,7 @@ export function parseRawCVText(text: string): CVData {
       break;
     }
   }
-  if (!data.location) data.location = "London, UK"; // Default
+  if (!data.location) data.location = ""; // Default
 
   // Section Tracking
   let currentSection = "summary"; // Start in summary
@@ -238,8 +238,8 @@ export function parseRawCVText(text: string): CVData {
   if (data.experience.length === 0 && data.education.length === 0 && data.skills.length === 0) {
     // If it's a completely unparsed copy, put the entire text block in professional summary
     data.professionalSummary = text;
-    data.fullName = data.fullName || "Your Name";
-    data.email = data.email || "email@domain.com";
+    data.fullName = data.fullName || "";
+    data.email = data.email || "";
   }
 
   return data;

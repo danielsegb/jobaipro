@@ -1,5 +1,29 @@
 import { CVData, AnalysisResult, CoverLetterData, JobDescriptionData } from "./types";
 
+export const emptyCVData: CVData = {
+  fullName: "",
+  email: "",
+  phone: "",
+  location: "",
+  linkedin: "",
+  portfolio: "",
+  professionalSummary: "",
+  skills: [],
+  experience: [],
+  education: [],
+  projects: [],
+  certifications: [],
+  additionalSections: ""
+};
+
+export const emptyCoverLetterData: CoverLetterData = {
+  recipient: "Hiring Manager",
+  companyName: "",
+  jobTitle: "",
+  content: "",
+  tone: "professional",
+};
+
 export const sampleCVData: CVData = {
   fullName: "Alexander Sterling",
   email: "alexander.sterling@email.co.uk",

@@ -24,7 +24,7 @@ import {
   CoverLetterData,
   TemplateStyle,
 } from "@/lib/types";
-import { sampleCVData } from "@/lib/sampleData";
+import { emptyCVData, emptyCoverLetterData } from "@/lib/sampleData";
 import { parseRawCVText } from "@/lib/cvParser";
 
 type Step = 1 | 2 | 3 | 4;
@@ -53,14 +53,8 @@ export default function OptimisePage() {
   const [analysisError, setAnalysisError] = React.useState("");
 
   // Generated documents state
-  const [cvData, setCvData] = React.useState<CVData>(sampleCVData);
-  const [coverLetterData, setCoverLetterData] = React.useState<CoverLetterData>({
-    recipient: "Hiring Manager",
-    companyName: "",
-    jobTitle: "",
-    content: "",
-    tone: "professional",
-  });
+  const [cvData, setCvData] = React.useState<CVData>(emptyCVData);
+  const [coverLetterData, setCoverLetterData] = React.useState<CoverLetterData>(emptyCoverLetterData);
   const [isGeneratingCV, setIsGeneratingCV] = React.useState(false);
   const [isGeneratingCL, setIsGeneratingCL] = React.useState(false);
   const [isRewritingSection, setIsRewritingSection] = React.useState(false);
@@ -289,7 +283,10 @@ export default function OptimisePage() {
                 <CVInputForm
                   cvText={cvText}
                   setCvText={setCvText}
-                  onNext={() => setStep(2)}
+                  onNext={() => {
+                    setCvData(parseRawCVText(cvText));
+                    setStep(2);
+                  }}
                 />
               </div>
             </div>

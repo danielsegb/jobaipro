@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateContent } from "@/lib/gemini";
 import { buildCVOptimisationPrompt } from "@/lib/aiPrompts";
-import { sampleOptimisedCVData } from "@/lib/sampleData";
+import { parseRawCVText } from "@/lib/cvParser";
 
 function cleanJsonResponse(text: string): string {
   let clean = text.trim();
@@ -26,9 +26,9 @@ export async function POST(req: NextRequest) {
 
     // Fallback if key missing
     if (!process.env.GEMINI_API_KEY) {
-      console.log("GEMINI_API_KEY not configured. Returning mock optimised CV.");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      return NextResponse.json({ optimisedCV: sampleOptimisedCVData });
+      console.log("GEMINI_API_KEY not configured. Returning parsed user CV.");
+      const parsed = parseRawCVText(cvText);
+      return NextResponse.json({ optimisedCV: parsed });
     }
 
     const prompt = buildCVOptimisationPrompt(cvText, jobDescription, jobTitle, companyName, industry);
@@ -39,9 +39,10 @@ export async function POST(req: NextRequest) {
       const parsedCV = JSON.parse(cleanJson);
       return NextResponse.json({ optimisedCV: parsedCV });
     } catch (apiError) {
-      console.error("Gemini API call failed during CV optimization, falling back to mock data:", apiError);
+      console.error("Gemini API call failed during CV optimization, falling back to parsed user CV:", apiError);
+      const parsed = parseRawCVText(cvText);
       return NextResponse.json({
-        optimisedCV: sampleOptimisedCVData,
+        optimisedCV: parsed,
         warning: "CV optimization completed using fallback engine."
       });
     }
