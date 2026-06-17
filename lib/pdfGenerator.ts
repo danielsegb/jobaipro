@@ -18,27 +18,57 @@ export const generatePDF = async (element: HTMLElement | null, filename: string)
     logging: false,
   });
 
-  const imgData = canvas.toDataURL("image/jpeg", 0.98);
   const pdf = new jsPDF({
     orientation: "portrait",
     unit: "mm",
     format: "a4",
   });
 
-  const imgWidth = 210; // A4 page width in mm
-  const pageHeight = 297; // A4 page height in mm
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  let heightLeft = imgHeight;
-  let position = 0;
+  const margin = 15; // 15mm margin on all sides
+  const printableWidth = 210 - (margin * 2); // 180mm
+  const printableHeight = 297 - (margin * 2); // 267mm
 
-  pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
+  const scale = printableWidth / canvas.width;
+  const pxPageHeight = printableHeight / scale;
 
-  while (heightLeft >= 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+  let canvasY = 0;
+  let pageCount = 0;
+
+  while (canvasY < canvas.height) {
+    const chunkHeight = Math.min(pxPageHeight, canvas.height - canvasY);
+
+    // Create a temporary canvas for this page chunk
+    const pageCanvas = document.createElement("canvas");
+    pageCanvas.width = canvas.width;
+    pageCanvas.height = chunkHeight;
+
+    const ctx = pageCanvas.getContext("2d");
+    if (ctx) {
+      // Draw the slice of the main canvas onto the page canvas
+      ctx.drawImage(
+        canvas,
+        0,
+        canvasY,
+        canvas.width,
+        chunkHeight,
+        0,
+        0,
+        canvas.width,
+        chunkHeight
+      );
+    }
+
+    const pageImgData = pageCanvas.toDataURL("image/jpeg", 0.98);
+
+    if (pageCount > 0) {
+      pdf.addPage();
+    }
+
+    const destHeight = chunkHeight * scale;
+    pdf.addImage(pageImgData, "JPEG", margin, margin, printableWidth, destHeight);
+
+    canvasY += chunkHeight;
+    pageCount++;
   }
 
   pdf.save(filename);
