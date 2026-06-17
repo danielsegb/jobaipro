@@ -1,117 +1,169 @@
 /**
- * PDF Generator using html2canvas-pro + jsPDF.
+ * PDF Generator — html2canvas-pro + jsPDF
  *
- * html2canvas-pro natively supports modern CSS color functions (oklch, lab, lch, etc.)
- * used by Tailwind CSS v4, so the browser does NOT freeze during rendering.
+ * html2canvas-pro natively handles Tailwind v4 colour functions (oklch, lab, lch, color())
+ * so the browser never freezes.
  *
- * Page splitting logic walks all direct child sections of the element and groups
- * them into pages, ensuring no individual section block is sliced in half.
+ * Page splitting walks every .break-inside-avoid block and every section heading,
+ * builds exclusion zones (regions that must not be cut), then always breaks at
+ * the latest SAFE boundary that fits within one A4 page height.
  */
-export const generatePDF = async (
-  element: HTMLElement | null,
-  filename: string
-) => {
-  if (!element) return;
 
-  // Dynamically import to avoid SSR issues in Next.js
-  const [html2canvasModule, jspdfModule] = await Promise.all([
-    import("html2canvas-pro"),
-    import("jspdf"),
-  ]);
+interface Zone  { top: number; bottom: number }
+interface Slice { start: number; end: number }
 
-  const html2canvas = html2canvasModule.default as any;
-  const { jsPDF } = jspdfModule;
+// ── helpers ────────────────────────────────────────────────────────────────
 
-  // A4 dimensions in mm
-  const PAGE_W_MM = 210;
-  const PAGE_H_MM = 297;
-  const MARGIN_MM = 15;
-  const CONTENT_W_MM = PAGE_W_MM - MARGIN_MM * 2; // 180mm
-  const CONTENT_H_MM = PAGE_H_MM - MARGIN_MM * 2; // 267mm
+function buildExclusionZones(
+  el: HTMLElement,
+  cTop: number,
+  sy: number
+): Zone[] {
+  const zones: Zone[] = [];
 
-  // Render the full element to a single hi-res canvas
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    logging: false,
-    backgroundColor: "#ffffff",
-    // Render at A4 content width in CSS pixels (at 96 dpi: 180mm → ~680px)
-    windowWidth: Math.round((CONTENT_W_MM / 25.4) * 96),
-  });
-
-  // px-per-mm ratio on the canvas
-  const pxPerMm = canvas.width / CONTENT_W_MM;
-  // How many canvas pixels fit in one printable page height
-  const pageHeightPx = CONTENT_H_MM * pxPerMm;
-
-  const pdf = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a4",
-  });
-
-  /**
-   * Collect the bottom-edges (in canvas pixels) of every "section-level" child.
-   * We use these as candidate split points so we never slice mid-element.
-   */
-  const elementRect = element.getBoundingClientRect();
-  const scaleX = canvas.width / elementRect.width;
-  const scaleY = canvas.height / elementRect.height;
-
-  // Gather bottom edges of all direct children (sections/divs)
-  const sectionBottoms: number[] = [];
-  for (const child of Array.from(element.children)) {
+  // 1. Every break-inside-avoid block (Tailwind class used in all templates)
+  el.querySelectorAll('.break-inside-avoid').forEach((child) => {
     const r = (child as HTMLElement).getBoundingClientRect();
-    const bottomPx = (r.bottom - elementRect.top) * scaleY;
-    sectionBottoms.push(bottomPx);
-  }
-  // Always include the very end
-  sectionBottoms.push(canvas.height);
+    const top    = (r.top    - cTop) * sy;
+    const bottom = (r.bottom - cTop) * sy;
+    if (bottom > top + 4) zones.push({ top, bottom });
+  });
 
-  // Build page slices: group sections until they exceed a page height
-  const slices: Array<{ start: number; end: number }> = [];
-  let pageStart = 0;
+  // 2. Heading + its immediate next sibling → protects orphaned headings
+  el.querySelectorAll('h2, h3').forEach((h) => {
+    const next = h.nextElementSibling;
+    if (!next) return;
+    const hR = h.getBoundingClientRect();
+    const nR = next.getBoundingClientRect();
+    zones.push({
+      top:    (hR.top    - cTop) * sy,
+      bottom: Math.min(
+        (hR.bottom - cTop) * sy + 50,
+        (nR.bottom - cTop) * sy
+      ),
+    });
+  });
 
-  while (pageStart < canvas.height) {
-    let pageEnd = pageStart + pageHeightPx;
+  return zones;
+}
 
-    if (pageEnd >= canvas.height) {
-      // Last page – just take the rest
-      slices.push({ start: pageStart, end: canvas.height });
+function collectSafeBreaks(
+  el: HTMLElement,
+  cTop: number,
+  sy: number,
+  canvasH: number,
+  zones: Zone[]
+): number[] {
+  const inZone = (p: number) =>
+    zones.some((z) => p > z.top + 2 && p < z.bottom - 2);
+
+  const cands = new Set<number>([canvasH]);
+
+  el.querySelectorAll(
+    'section, header, .break-inside-avoid, h1, h2, h3, li, p'
+  ).forEach((child) => {
+    const r = (child as HTMLElement).getBoundingClientRect();
+    const top    = Math.round((r.top    - cTop) * sy);
+    const bottom = Math.round((r.bottom - cTop) * sy);
+    if (top    > 0 && top    < canvasH) cands.add(top);
+    if (bottom > 0 && bottom < canvasH) cands.add(bottom);
+  });
+
+  return Array.from(cands)
+    .filter((p) => p > 0 && p <= canvasH && !inZone(p))
+    .sort((a, b) => a - b);
+}
+
+function buildSlices(canvasH: number, pageH: number, safe: number[]): Slice[] {
+  const slices: Slice[] = [];
+  let start = 0;
+
+  while (start < canvasH) {
+    const idealEnd = start + pageH;
+
+    if (idealEnd >= canvasH) {
+      slices.push({ start, end: canvasH });
       break;
     }
 
-    // Find the best break point: the largest section bottom that fits
-    // within this page's height. If none fits, we fall back to a hard cut.
-    let bestBreak = pageEnd;
-    for (const bottom of sectionBottoms) {
-      if (bottom > pageStart && bottom <= pageEnd) {
-        bestBreak = bottom;
-      }
+    let best = -1;
+    for (const bp of safe) {
+      if (bp > start && bp <= idealEnd) best = bp;
+      else if (bp > idealEnd) break;
     }
+    if (best <= start || best === -1) best = idealEnd;
 
-    slices.push({ start: pageStart, end: bestBreak });
-    pageStart = bestBreak;
+    slices.push({ start, end: best });
+    start = best;
   }
 
-  // Draw each slice onto a new PDF page
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = canvas.width;
+  return slices.length > 0 ? slices : [{ start: 0, end: canvasH }];
+}
 
-  slices.forEach((slice, idx) => {
-    const sliceH = slice.end - slice.start;
-    tempCanvas.height = sliceH;
+// ── main export ────────────────────────────────────────────────────────────
 
-    const ctx = tempCanvas.getContext("2d")!;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, tempCanvas.width, sliceH);
+export const generatePDF = async (
+  element: HTMLElement | null,
+  filename: string
+): Promise<void> => {
+  if (!element) return;
+
+  const [h2cMod, jspdfMod] = await Promise.all([
+    import('html2canvas-pro'),
+    import('jspdf'),
+  ]);
+  const html2canvas = h2cMod.default as any;
+  const { jsPDF }   = jspdfMod;
+
+  // A4 constants (mm)
+  const PAGE_W = 210;
+  const PAGE_H = 297;
+
+  // Render the full element at ×2 resolution
+  const canvas = await html2canvas(element, {
+    scale:           2,
+    useCORS:         true,
+    logging:         false,
+    backgroundColor: '#ffffff',
+    windowWidth:     element.offsetWidth,
+  });
+
+  // 1 mm = canvas.width / 210 canvas-pixels
+  const pxPerMm   = canvas.width / PAGE_W;
+  const pageHpx   = PAGE_H * pxPerMm;             // canvas px per A4 page
+
+  const rect  = element.getBoundingClientRect();
+  const cTop  = rect.top;
+  const scaleY = canvas.height / rect.height;      // DOM px → canvas px
+
+  // Compute safe page-break positions
+  const zones  = buildExclusionZones(element, cTop, scaleY);
+  const safe   = collectSafeBreaks(element, cTop, scaleY, canvas.height, zones);
+  const slices = buildSlices(canvas.height, pageHpx, safe);
+
+  // Render each slice onto its own PDF page
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const tmp = document.createElement('canvas');
+  tmp.width = canvas.width;
+
+  slices.forEach((slice, i) => {
+    const h = Math.round(slice.end - slice.start);
+    tmp.height = h;
+    const ctx = tmp.getContext('2d')!;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, tmp.width, h);
     ctx.drawImage(canvas, 0, -slice.start);
 
-    const imgData = tempCanvas.toDataURL("image/jpeg", 0.95);
-    const sliceHeightMm = sliceH / pxPerMm;
-
-    if (idx > 0) pdf.addPage();
-    pdf.addImage(imgData, "JPEG", MARGIN_MM, MARGIN_MM, CONTENT_W_MM, sliceHeightMm);
+    if (i > 0) pdf.addPage();
+    // 1:1 mapping: element width = A4 width, no extra margins
+    // (the template's own p-8 padding acts as the visual margin)
+    pdf.addImage(
+      tmp.toDataURL('image/jpeg', 0.95),
+      'JPEG',
+      0, 0,
+      PAGE_W,
+      h / pxPerMm
+    );
   });
 
   pdf.save(filename);

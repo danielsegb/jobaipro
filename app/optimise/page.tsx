@@ -12,6 +12,7 @@ import { AnalysisResults } from "@/components/optimise/AnalysisResults";
 import { CVEditor } from "@/components/editor/CVEditor";
 import { CoverLetterEditor } from "@/components/editor/CoverLetterEditor";
 import { CVPreview } from "@/components/editor/CVPreview";
+import { PagedCVPreview } from "@/components/editor/PagedCVPreview";
 import { CoverLetterPreview } from "@/components/editor/CoverLetterPreview";
 import { TemplateSelector } from "@/components/editor/TemplateSelector";
 import { DownloadButtons } from "@/components/editor/DownloadButtons";
@@ -430,7 +431,7 @@ export default function OptimisePage() {
                   <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider">Live Preview</h3>
 
                   {activeEditorTab === "cv" && (
-                    <CVPreview data={cvData} templateStyle={templateStyle} />
+                    <PagedCVPreview data={cvData} templateStyle={templateStyle} />
                   )}
 
                   {activeEditorTab === "cover-letter" && (
