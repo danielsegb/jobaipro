@@ -66,7 +66,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="text-slate-600 hover:text-blue-600 transition-colors"
                 >
-                  About & More
+                  About & Contact
                 </a>
               </li>
             </ul>
