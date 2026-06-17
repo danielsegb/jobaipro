@@ -3,12 +3,13 @@ import { Button } from "../ui/Button";
 import { CVData, CoverLetterData } from "@/lib/types";
 import { generatePDF } from "@/lib/pdfGenerator";
 import { generateCVDocx, generateCLDocx } from "@/lib/docxGenerator";
+import { useReactToPrint } from "react-to-print";
 
 export interface DownloadButtonsProps {
   cvData: CVData;
   coverLetterData?: CoverLetterData;
-  cvRef: React.RefObject<HTMLElement | null>;
-  clRef: React.RefObject<HTMLElement | null>;
+  cvRef: React.RefObject<HTMLDivElement | null>;
+  clRef: React.RefObject<HTMLDivElement | null>;
   hasCL: boolean;
   onSaveDraft?: () => void;
   draftSaved?: boolean;
@@ -24,11 +25,18 @@ export function DownloadButtons({
   draftSaved
 }: DownloadButtonsProps) {
   
+  const handlePrintCV = useReactToPrint({
+    contentRef: cvRef as React.RefObject<HTMLDivElement>,
+    documentTitle: `${cvData.fullName || 'CV'}_CV`,
+  });
+
+  const handlePrintCL = useReactToPrint({
+    contentRef: clRef as React.RefObject<HTMLDivElement>,
+    documentTitle: `${cvData.fullName || 'Cover_Letter'}_CL`,
+  });
+
   const handleDownloadCVPdf = async () => {
-    if (cvRef.current) {
-      const filename = `${cvData.fullName || 'CV'}_CV.pdf`;
-      await generatePDF(cvRef.current, filename);
-    }
+    handlePrintCV();
   };
 
   const handleDownloadCVDocx = async () => {
@@ -37,9 +45,8 @@ export function DownloadButtons({
   };
 
   const handleDownloadCLPdf = async () => {
-    if (clRef.current && coverLetterData) {
-      const filename = `${cvData.fullName || 'Cover_Letter'}_CL.pdf`;
-      await generatePDF(clRef.current, filename);
+    if (coverLetterData) {
+      handlePrintCL();
     }
   };
 

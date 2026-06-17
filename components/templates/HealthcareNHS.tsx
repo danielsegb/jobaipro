@@ -54,7 +54,7 @@ export function HealthcareNHS({ data }: TemplateProps) {
           </h2>
           <div className="space-y-4 px-3">
             {data.experience.map((exp, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900 text-sm">
                   <span>{exp.jobTitle}</span>
                   <span className="text-xs text-slate-500 font-normal">
@@ -90,7 +90,7 @@ export function HealthcareNHS({ data }: TemplateProps) {
           </h2>
           <div className="space-y-3 px-3">
             {data.education.map((edu, idx) => (
-              <div key={idx} className="text-xs">
+              <div key={idx} className="text-xs break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span>{edu.qualification}</span>
                   <span className="text-slate-500 font-normal">{edu.startDate} – {edu.endDate}</span>

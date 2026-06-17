@@ -56,7 +56,7 @@ export function TechMinimal({ data }: TemplateProps) {
           </h2>
           <div className="space-y-4 font-sans">
             {data.experience.map((exp, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900 text-[13px] font-mono">
                   <span>{exp.jobTitle} @ {exp.company}</span>
                   <span className="text-[10px] text-slate-500 font-normal">
@@ -92,7 +92,7 @@ export function TechMinimal({ data }: TemplateProps) {
           </h2>
           <div className="space-y-3 font-sans">
             {data.projects.map((proj, idx) => (
-              <div key={idx} className="space-y-1 text-xs">
+              <div key={idx} className="space-y-1 text-xs break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900 font-mono">
                   <span className="text-[12.5px]">{proj.title}</span>
                   {proj.link && <span className="text-[10px] text-blue-600 font-normal">{proj.link}</span>}
@@ -117,7 +117,7 @@ export function TechMinimal({ data }: TemplateProps) {
           </h2>
           <div className="space-y-2">
             {data.education.map((edu, idx) => (
-              <div key={idx} className="text-slate-700">
+              <div key={idx} className="text-slate-700 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span>{edu.qualification}</span>
                   <span className="text-[10px] text-slate-500 font-normal">

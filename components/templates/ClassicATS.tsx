@@ -49,7 +49,7 @@ export function ClassicATS({ data }: TemplateProps) {
           </h2>
           <div className="space-y-4">
             {data.experience.map((exp, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span>{exp.jobTitle} – {exp.company}</span>
                   <span className="text-xs font-normal text-slate-600 font-sans">
@@ -85,7 +85,7 @@ export function ClassicATS({ data }: TemplateProps) {
           </h2>
           <div className="space-y-3">
             {data.projects.map((proj, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span>{proj.title}</span>
                   {proj.link && <span className="text-xs font-normal text-slate-500 font-sans">{proj.link}</span>}
@@ -110,7 +110,7 @@ export function ClassicATS({ data }: TemplateProps) {
           </h2>
           <div className="space-y-3">
             {data.education.map((edu, idx) => (
-              <div key={idx} className="space-y-0.5">
+              <div key={idx} className="space-y-0.5 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span>{edu.qualification}</span>
                   <span className="text-xs font-normal text-slate-600 font-sans">

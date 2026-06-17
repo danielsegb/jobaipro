@@ -37,7 +37,7 @@ export function Graduate({ data }: TemplateProps) {
           </h2>
           <div className="space-y-3">
             {data.education.map((edu, idx) => (
-              <div key={idx} className="space-y-0.5">
+              <div key={idx} className="space-y-0.5 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span>{edu.qualification}</span>
                   <span className="text-xs text-slate-500 font-normal">
@@ -62,7 +62,7 @@ export function Graduate({ data }: TemplateProps) {
           </h2>
           <div className="space-y-3">
             {data.projects.map((proj, idx) => (
-              <div key={idx} className="space-y-1 text-xs">
+              <div key={idx} className="space-y-1 text-xs break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900">
                   <span className="text-sm">{proj.title}</span>
                   {proj.link && <span className="text-[10px] text-blue-600 underline font-normal">{proj.link}</span>}
@@ -87,7 +87,7 @@ export function Graduate({ data }: TemplateProps) {
           </h2>
           <div className="space-y-4">
             {data.experience.map((exp, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1 break-inside-avoid">
                 <div className="flex justify-between items-baseline font-bold text-slate-900 text-sm">
                   <span>{exp.jobTitle}</span>
                   <span className="text-xs text-slate-500 font-normal">
