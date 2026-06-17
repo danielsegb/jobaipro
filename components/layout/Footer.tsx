@@ -49,12 +49,15 @@ export function Footer() {
           <div>
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Resources</h4>
             <ul className="space-y-2.5 text-sm">
-
               <li>
-                <span className="text-slate-400 cursor-not-allowed">Privacy Policy</span>
+                <Link href="/privacy" className="text-slate-600 hover:text-blue-600 transition-colors">
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <span className="text-slate-400 cursor-not-allowed">Terms of Service</span>
+                <Link href="/terms" className="text-slate-600 hover:text-blue-600 transition-colors">
+                  Terms of Service
+                </Link>
               </li>
             </ul>
           </div>
