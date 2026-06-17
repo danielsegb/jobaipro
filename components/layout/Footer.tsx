@@ -59,6 +59,16 @@ export function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <a
+                  href="https://danielse.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-600 hover:text-blue-600 transition-colors"
+                >
+                  About & More
+                </a>
+              </li>
             </ul>
           </div>
         </div>
