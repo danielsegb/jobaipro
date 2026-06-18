@@ -176,24 +176,16 @@ export function PagedCVPreview({ data, templateStyle }: PagedCVPreviewProps) {
       {slices ? (
         <div className="flex flex-col gap-4">
           {slices.map((slice, idx) => {
-            /**
-             * Page 1: card height = slice content height; content starts at y=0.
-             * Pages 2+: card height = full A4H (same physical page size);
-             *   content is pushed DOWN by TOP_PADDING_PX so white space appears
-             *   at the top — exactly matching the PDF's white rect.
-             *
-             * Inner div top offset (in display px):
-             *   Page 1: -(slice.start × scale)  — normally 0 since slice.start=0
-             *   Pages 2+: (TOP_PADDING_PX − slice.start) × scale
-             *             → content at y=slice.start lands at y=TOP_PADDING_PX×scale
-             */
-            const isFirst       = idx === 0;
-            const pageCardH     = isFirst
+            const isFirst = idx === 0;
+
+            // 1. Outer page container dimensions
+            const pageCardH = slices.length === 1 
               ? Math.round((slice.end - slice.start) * scale)
               : Math.round(A4H * scale);
-            const innerTopPx    = isFirst
-              ? -Math.round(slice.start * scale)
-              : Math.round((TOP_PADDING_PX - slice.start) * scale);
+
+            // 2. Viewport dimensions & positioning
+            const topPaddingDisplay = isFirst ? 0 : Math.round(TOP_PADDING_PX * scale);
+            const viewportHeightDisplay = Math.round((slice.end - slice.start) * scale);
 
             return (
               <div key={`cv-page-${idx}`}>
@@ -207,24 +199,41 @@ export function PagedCVPreview({ data, templateStyle }: PagedCVPreviewProps) {
                   </div>
                 )}
 
+                {/* 1. Outer page container */}
                 <div
-                  className="bg-white shadow-md border border-slate-200 overflow-hidden"
-                  style={{ width: displayW, height: pageCardH, position: 'relative' }}
+                  className="bg-white shadow-md border border-slate-200"
+                  style={{
+                    position: 'relative',
+                    width: displayW,
+                    height: pageCardH,
+                    overflow: 'hidden', // Hides anything bleeding past the bottom of the A4 card
+                  }}
                 >
+                  {/* 2. Inner content viewport */}
                   <div
                     style={{
-                      position:        'absolute',
-                      top:             innerTopPx,
-                      left:            0,
-                      width:           A4W,
-                      transform:       `scale(${scale})`,
-                      transformOrigin: 'top left',
-                      // Hides anything physically drawn above the slice boundary
-                      // so it doesn't bleed into the white top-padding gap.
-                      clipPath:        `inset(${Math.round(slice.start)}px 0 0 0)`
+                      position: 'absolute',
+                      top: topPaddingDisplay,
+                      left: 0,
+                      width: displayW,
+                      height: viewportHeightDisplay,
+                      overflow: 'hidden', // Strictly clips the content to exactly the slice height
+                      background: 'white',
                     }}
                   >
-                    <Template data={data} style={templateStyle} />
+                    {/* 3. Full CV content wrapper */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: A4W,
+                        transform: `translateY(${-slice.start}px) scale(${scale})`,
+                        transformOrigin: 'top left',
+                      }}
+                    >
+                      <Template data={data} style={templateStyle} />
+                    </div>
                   </div>
                 </div>
               </div>
