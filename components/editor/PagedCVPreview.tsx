@@ -29,6 +29,12 @@ import { Graduate }            from '../templates/Graduate';
 const A4W = 794;   // px
 const A4H = 1123;  // px
 
+/**
+ * Top padding reserved at the top of every continuation page (≈ 10 mm at 96 dpi).
+ * Must match TOP_PADDING_MM in pdfGenerator.ts  (10 mm × 3.779 px/mm ≈ 38 px).
+ */
+const TOP_PADDING_PX = 38;
+
 interface Slice { start: number; end: number }
 
 // ── Template renderer ──────────────────────────────────────────────────────
@@ -87,12 +93,16 @@ function paginate(el: HTMLElement): Slice[] {
     .filter((p) => p > 0 && p <= totalH && !inZone(p))
     .sort((a, b) => a - b);
 
-  // Build slices using A4 page height
+  // Build slices —
+  //   Page 1 : full A4H (template's p-8 is the visual top margin)
+  //   Pages 2+: A4H − TOP_PADDING_PX  (the padding is shown as white space in the card)
   const slices: Slice[] = [];
-  let start = 0;
+  let start   = 0;
+  let isFirst = true;
 
   while (start < totalH) {
-    const idealEnd = start + A4H;
+    const pageH    = isFirst ? A4H : A4H - TOP_PADDING_PX;
+    const idealEnd = start + pageH;
 
     if (idealEnd >= totalH) {
       slices.push({ start, end: totalH });
@@ -107,7 +117,8 @@ function paginate(el: HTMLElement): Slice[] {
     if (best <= start || best === -1) best = idealEnd;
 
     slices.push({ start, end: best });
-    start = best;
+    start   = best;
+    isFirst = false;
   }
 
   return slices.length > 0 ? slices : [{ start: 0, end: totalH }];
@@ -165,7 +176,25 @@ export function PagedCVPreview({ data, templateStyle }: PagedCVPreviewProps) {
       {slices ? (
         <div className="flex flex-col gap-4">
           {slices.map((slice, idx) => {
-            const pageDisplayH = Math.round((slice.end - slice.start) * scale);
+            /**
+             * Page 1: card height = slice content height; content starts at y=0.
+             * Pages 2+: card height = full A4H (same physical page size);
+             *   content is pushed DOWN by TOP_PADDING_PX so white space appears
+             *   at the top — exactly matching the PDF's white rect.
+             *
+             * Inner div top offset (in display px):
+             *   Page 1: -(slice.start × scale)  — normally 0 since slice.start=0
+             *   Pages 2+: (TOP_PADDING_PX − slice.start) × scale
+             *             → content at y=slice.start lands at y=TOP_PADDING_PX×scale
+             */
+            const isFirst       = idx === 0;
+            const pageCardH     = isFirst
+              ? Math.round((slice.end - slice.start) * scale)
+              : Math.round(A4H * scale);
+            const innerTopPx    = isFirst
+              ? -Math.round(slice.start * scale)
+              : Math.round((TOP_PADDING_PX - slice.start) * scale);
+
             return (
               <div key={`cv-page-${idx}`}>
                 {slices.length > 1 && (
@@ -178,27 +207,14 @@ export function PagedCVPreview({ data, templateStyle }: PagedCVPreviewProps) {
                   </div>
                 )}
 
-                {/*
-                  Page card: clips the template to just the slice's pixel range.
-
-                  The inner div:
-                    - Is positioned at top = -(slice.start × scale) to scroll
-                      the content up so slice.start aligns with y=0
-                    - Is scaled from 794px → displayW using transform:scale
-                    - transform-origin:top left ensures the scale anchors at (0,0)
-
-                  Math: template content at y=slice.start (794px space)
-                    → visual y within inner div = slice.start × scale
-                    → container y = -(slice.start×scale) + (slice.start×scale) = 0 ✓
-                */}
                 <div
                   className="bg-white shadow-md border border-slate-200 overflow-hidden"
-                  style={{ width: displayW, height: pageDisplayH, position: 'relative' }}
+                  style={{ width: displayW, height: pageCardH, position: 'relative' }}
                 >
                   <div
                     style={{
                       position:        'absolute',
-                      top:             -Math.round(slice.start * scale),
+                      top:             innerTopPx,
                       left:            0,
                       width:           A4W,
                       transform:       `scale(${scale})`,

@@ -4,13 +4,23 @@
  * html2canvas-pro natively handles Tailwind v4 colour functions (oklch, lab, lch, color())
  * so the browser never freezes.
  *
- * Page splitting walks every .break-inside-avoid block and every section heading,
- * builds exclusion zones (regions that must not be cut), then always breaks at
- * the latest SAFE boundary that fits within one A4 page height.
+ * Page splitting strategy
+ * ────────────────────────
+ * • Page 1  uses a full A4 height content window (297 mm).
+ *   The template's own p-8 padding (≈ 8.5 mm) acts as the top margin.
+ * • Pages 2+ reserve TOP_PADDING_MM of white space at the top so every
+ *   continuation page has the same breathing room as page 1.
+ *   Their content window is therefore (297 − TOP_PADDING_MM) mm.
+ *
+ * Exclusion zones ensure no .break-inside-avoid block or heading is ever
+ * split across a page boundary.
  */
 
 interface Zone  { top: number; bottom: number }
 interface Slice { start: number; end: number }
+
+// Top padding added to every continuation page (mm / preview-px counterpart in PagedCVPreview)
+const TOP_PADDING_MM = 10;   // ≈ same as template p-8 (8.5 mm)
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -74,11 +84,23 @@ function collectSafeBreaks(
     .sort((a, b) => a - b);
 }
 
-function buildSlices(canvasH: number, pageH: number, safe: number[]): Slice[] {
+/**
+ * Build page slices.
+ * page1H  – usable canvas pixels for the first page  (full A4 height)
+ * pageNH  – usable canvas pixels for pages 2+        (A4 − top-padding)
+ */
+function buildSlices(
+  canvasH: number,
+  page1H: number,
+  pageNH: number,
+  safe: number[]
+): Slice[] {
   const slices: Slice[] = [];
-  let start = 0;
+  let start   = 0;
+  let isFirst = true;
 
   while (start < canvasH) {
+    const pageH    = isFirst ? page1H : pageNH;
     const idealEnd = start + pageH;
 
     if (idealEnd >= canvasH) {
@@ -94,7 +116,8 @@ function buildSlices(canvasH: number, pageH: number, safe: number[]): Slice[] {
     if (best <= start || best === -1) best = idealEnd;
 
     slices.push({ start, end: best });
-    start = best;
+    start   = best;
+    isFirst = false;
   }
 
   return slices.length > 0 ? slices : [{ start: 0, end: canvasH }];
@@ -129,17 +152,21 @@ export const generatePDF = async (
   });
 
   // 1 mm = canvas.width / 210 canvas-pixels
-  const pxPerMm   = canvas.width / PAGE_W;
-  const pageHpx   = PAGE_H * pxPerMm;             // canvas px per A4 page
+  const pxPerMm = canvas.width / PAGE_W;
 
-  const rect  = element.getBoundingClientRect();
-  const cTop  = rect.top;
-  const scaleY = canvas.height / rect.height;      // DOM px → canvas px
+  // Page 1 gets the full A4 height.
+  // Pages 2+ lose TOP_PADDING_MM at the top (filled with white in the PDF).
+  const page1Hpx = PAGE_H                       * pxPerMm;
+  const pageNHpx = (PAGE_H - TOP_PADDING_MM)    * pxPerMm;
+
+  const rect   = element.getBoundingClientRect();
+  const cTop   = rect.top;
+  const scaleY = canvas.height / rect.height;   // DOM px → canvas px
 
   // Compute safe page-break positions
   const zones  = buildExclusionZones(element, cTop, scaleY);
   const safe   = collectSafeBreaks(element, cTop, scaleY, canvas.height, zones);
-  const slices = buildSlices(canvas.height, pageHpx, safe);
+  const slices = buildSlices(canvas.height, page1Hpx, pageNHpx, safe);
 
   // Render each slice onto its own PDF page
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -154,16 +181,23 @@ export const generatePDF = async (
     ctx.fillRect(0, 0, tmp.width, h);
     ctx.drawImage(canvas, 0, -slice.start);
 
+    const imgData    = tmp.toDataURL('image/jpeg', 0.95);
+    const contentMm  = h / pxPerMm;
+
     if (i > 0) pdf.addPage();
-    // 1:1 mapping: element width = A4 width, no extra margins
-    // (the template's own p-8 padding acts as the visual margin)
-    pdf.addImage(
-      tmp.toDataURL('image/jpeg', 0.95),
-      'JPEG',
-      0, 0,
-      PAGE_W,
-      h / pxPerMm
-    );
+
+    if (i === 0) {
+      // Page 1 — fill the full page from top edge
+      // (the template's own p-8 padding provides the visual top margin)
+      pdf.addImage(imgData, 'JPEG', 0, 0, PAGE_W, contentMm);
+    } else {
+      // Pages 2+ — draw a white top-padding strip, then the content below it.
+      // Because pageNHpx already excludes the padding rows, contentMm ≤ 287 mm,
+      // so TOP_PADDING_MM + contentMm ≤ 297 mm and nothing overflows.
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 0, PAGE_W, TOP_PADDING_MM, 'F');
+      pdf.addImage(imgData, 'JPEG', 0, TOP_PADDING_MM, PAGE_W, contentMm);
+    }
   });
 
   pdf.save(filename);
