@@ -219,6 +219,9 @@ export function PagedCVPreview({ data, templateStyle }: PagedCVPreviewProps) {
                       width:           A4W,
                       transform:       `scale(${scale})`,
                       transformOrigin: 'top left',
+                      // Hides anything physically drawn above the slice boundary
+                      // so it doesn't bleed into the white top-padding gap.
+                      clipPath:        `inset(${Math.round(slice.start)}px 0 0 0)`
                     }}
                   >
                     <Template data={data} style={templateStyle} />
