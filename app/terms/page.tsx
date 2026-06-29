@@ -35,7 +35,7 @@ export default function TermsOfServicePage() {
                 1. Acceptance of Terms
               </h2>
               <p>
-                By accessing or using the Job AI Pro website ("Service"), you agree to be bound by these Terms of Service. If you do not agree to all of these terms, please do not use or access the Service.
+                By accessing or using the Job AI Pro website (&quot;Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to all of these terms, please do not use or access the Service.
               </p>
             </section>
 

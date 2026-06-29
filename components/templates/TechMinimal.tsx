@@ -23,7 +23,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.professionalSummary && (
         <section className="mb-5">
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-2">
-            // Profile Summary
+            {"// Profile Summary"}
           </h2>
           <p className="text-slate-700 leading-relaxed font-sans text-[12.5px] text-justify">{data.professionalSummary}</p>
         </section>
@@ -33,7 +33,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.skills && data.skills.length > 0 && (
         <section className="mb-5">
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-2">
-            // Core Stack & Skills
+            {"// Core Stack & Skills"}
           </h2>
           <div className="flex flex-wrap gap-1.5 pt-0.5">
             {data.skills.map((skill, idx) => (
@@ -52,7 +52,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.experience && data.experience.length > 0 && (
         <section className="mb-5">
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-3">
-            // Professional Work
+            {"// Professional Work"}
           </h2>
           <div className="space-y-4 font-sans">
             {data.experience.map((exp, idx) => (
@@ -88,7 +88,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.projects && data.projects.length > 0 && (
         <section className="mb-5">
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-3">
-            // Personal & Open Source Projects
+            {"// Personal & Open Source Projects"}
           </h2>
           <div className="space-y-3 font-sans">
             {data.projects.map((proj, idx) => (
@@ -113,7 +113,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.education && data.education.length > 0 && (
         <section className="mb-5">
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-2.5">
-            // Education
+            {"// Education"}
           </h2>
           <div className="space-y-2">
             {data.education.map((edu, idx) => (
@@ -138,7 +138,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.certifications && data.certifications.length > 0 && (
         <section className="mb-5">
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-2">
-            // Certs
+            {"// Certs"}
           </h2>
           <ul className="space-y-0.5 text-slate-700 text-[11px]">
             {data.certifications.map((cert, idx) => (
@@ -152,7 +152,7 @@ export function TechMinimal({ data }: TemplateProps) {
       {data.additionalSections && (
         <section>
           <h2 className="text-slate-900 font-bold uppercase tracking-wider border-b border-slate-200 pb-0.5 mb-2">
-            // Additional Details
+            {"// Additional Details"}
           </h2>
           <p className="text-slate-700 leading-relaxed font-sans text-justify">{data.additionalSections}</p>
         </section>

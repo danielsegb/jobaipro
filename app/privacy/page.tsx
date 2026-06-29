@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
                   <strong className="text-slate-800">Google Gemini API:</strong> We utilize Google’s Gemini large language models to analyze your qualifications, compare them against target job descriptions, rewrite sections, and draft personalized cover letters.
                 </li>
                 <li>
-                  <strong className="text-slate-800">Data Agreements:</strong> Under our integration agreements, your submitted data (CV content and Job Descriptions) is transmitted securely to Google’s API for the sole purpose of processing your requests in real-time. Your data is not stored permanently by Google, nor is it used to train Google's public generative AI models.
+                  <strong className="text-slate-800">Data Agreements:</strong> Under our integration agreements, your submitted data (CV content and Job Descriptions) is transmitted securely to Google’s API for the sole purpose of processing your requests in real-time. Your data is not stored permanently by Google, nor is it used to train Google&apos;s public generative AI models.
                 </li>
               </ul>
             </section>

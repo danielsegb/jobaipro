@@ -1,12 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GEMINI_API_KEY;
-
 /**
  * Initializes the Gemini generative model.
  * Returns null if the API key is missing.
  */
 export function getGeminiModel(modelName: "gemini-2.5-flash" | "gemini-1.5-flash" = "gemini-2.5-flash") {
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return null;
   }
@@ -27,6 +26,7 @@ export async function generateContent(
   prompt: string,
   options: { jsonMode?: boolean } = {}
 ): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is missing");
   }

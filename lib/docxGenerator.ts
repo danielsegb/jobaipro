@@ -3,6 +3,7 @@ import { saveAs } from "file-saver";
 import { CVData, CoverLetterData } from "./types";
 
 export const generateCVDocx = async (data: CVData, filename: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const children: any[] = [];
 
   // Name and Contact
@@ -228,6 +229,7 @@ export const generateCVDocx = async (data: CVData, filename: string) => {
 };
 
 export const generateCLDocx = async (data: CoverLetterData, filename: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const children: any[] = [];
 
   children.push(

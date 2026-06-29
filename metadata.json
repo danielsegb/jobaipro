@@ -1,0 +1,6 @@
+{
+  "name": "Job AI Pro",
+  "description": "An AI-powered job application optimizer, resume builder, and cover letter generator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

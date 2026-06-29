@@ -5,7 +5,6 @@ import { CVData, ExperienceItem, EducationItem, ProjectItem } from "./types";
  * to convert raw text into a structured CVData object.
  */
 export function parseRawCVText(text: string): CVData {
-  const lines = text.split("\n").map(l => l.trim());
   const data: CVData = {
     fullName: "",
     email: "",
@@ -22,7 +21,25 @@ export function parseRawCVText(text: string): CVData {
     additionalSections: ""
   };
 
-  if (lines.length === 0 || !text.trim()) {
+  if (!text || !text.trim()) {
+    return data;
+  }
+
+  // Strip page-break / separator artifacts
+  const cleanLines: string[] = [];
+  const rawLines = text.split(/\r?\n/);
+  for (const rawLine of rawLines) {
+    const trimmedLine = rawLine.trim();
+    if (/-*\s*Page \(\d+\) Break\s*-*/gi.test(trimmedLine)) {
+      continue;
+    }
+    // Strip runs of dashes
+    const sanitizedLine = trimmedLine.replace(/-{2,}/g, "");
+    cleanLines.push(sanitizedLine.trim());
+  }
+
+  const lines = cleanLines.filter(line => line.length > 0);
+  if (lines.length === 0) {
     return data;
   }
 
@@ -32,18 +49,7 @@ export function parseRawCVText(text: string): CVData {
   const linkedinRegex = /(?:linkedin\.com\/in\/[a-zA-Z0-9-_]+)/i;
   const portfolioRegex = /(?:[a-zA-Z0-9-]+\.(?:com|co\.uk|org|net|dev|io|me))/i;
 
-  // Try to find contacts in the first 10 lines
-  const headerLines = lines.slice(0, 10);
-  
-  // Name is usually the first non-empty line
-  for (const line of headerLines) {
-    if (line && !data.fullName && !line.includes("@") && !line.match(/\+?\d/) && line.length < 50) {
-      data.fullName = line;
-      break;
-    }
-  }
-
-  // Parse contact details
+  // Find contact details first to use in name search proximity
   for (const line of lines) {
     // Email
     if (!data.email) {
@@ -67,7 +73,50 @@ export function parseRawCVText(text: string): CVData {
     }
   }
 
+  // Choose the name from the line nearest the email/phone in the header (first 15 lines),
+  // rejecting all-caps lines longer than ~3 words as names, and avoiding common document titles.
+  let contactLineIdx = -1;
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
+    if (lines[i].match(emailRegex) || lines[i].match(phoneRegex)) {
+      contactLineIdx = i;
+      break;
+    }
+  }
+
+  const invalidNameKeywords = ["cv", "resume", "curriculum vitae", "portfolio", "linkedin", "contact", "experience", "education", "skills", "summary", "profile", "about", "page", "break", "software engineer", "developer", "designer"];
+  let bestName = "";
+  let bestDist = Infinity;
+
+  for (let i = 0; i < Math.min(15, lines.length); i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    // Reject lines with contact details, colons, slashes, or pipes which are usually sections or contact blocks
+    if (line.includes("@") || line.match(/\+?\d/) || line.includes(":") || line.includes("|") || line.includes("/")) continue;
+
+    const words = line.split(/\s+/).filter(Boolean);
+    if (words.length === 0 || words.length > 4) continue; // Real names are usually 1 to 4 words
+
+    // Reject all-caps lines longer than ~3 words
+    const isAllCaps = line === line.toUpperCase() && /[A-Z]/.test(line);
+    if (isAllCaps && words.length > 3) continue;
+
+    // Reject if line contains generic/invalid headers
+    const lowerLine = line.toLowerCase();
+    if (invalidNameKeywords.some(kw => lowerLine.includes(kw))) continue;
+
+    // Proximity logic
+    const dist = contactLineIdx !== -1 ? Math.abs(i - contactLineIdx) : i;
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestName = line;
+    }
+  }
+
+  data.fullName = bestName;
+
   // Guess location (look for UK postcodes or common words in header)
+  const headerLines = lines.slice(0, 10);
   for (const line of headerLines) {
     if (line.toLowerCase().includes("london") || line.toLowerCase().includes("manchester") || line.toLowerCase().includes("uk") || line.toLowerCase().includes("united kingdom")) {
       data.location = line.replace(/^[|•,\s]+|[|•,\s]+$/g, "").trim();
@@ -108,12 +157,30 @@ export function parseRawCVText(text: string): CVData {
     if (section === "summary") {
       data.professionalSummary = sectionText;
     } else if (section === "skills") {
-      // Split by commas, bullet points, or newlines
-      const splitSkills = sectionText
-        .split(/[,\n•|]/)
-        .map(s => s.trim())
-        .filter(s => s.length > 1 && s.length < 50);
-      data.skills.push(...splitSkills);
+      // Split by commas, bullet points, pipe, or newlines
+      const rawTokens = sectionText.split(/[,\n•|]/);
+      const filteredSkills: string[] = [];
+      for (const token of rawTokens) {
+        const trimmed = token.trim();
+        if (!trimmed) continue;
+
+        // Check word count (must be <= 6 words)
+        const words = trimmed.split(/\s+/).filter(Boolean);
+        if (words.length > 6) continue;
+
+        // Check for sentence punctuation (. ! ? ;)
+        if (/[.?!;](\s|$)/.test(trimmed)) {
+          // Allow single word abbreviations like .NET but reject sentence punctuation
+          if (words.length > 1 || !trimmed.startsWith(".")) {
+            continue;
+          }
+        }
+
+        if (trimmed.length > 1 && trimmed.length < 50) {
+          filteredSkills.push(trimmed);
+        }
+      }
+      data.skills.push(...filteredSkills);
     } else if (section === "experience") {
       // Heuristic parsing of experience items
       const blockLines = sectionText.split("\n");

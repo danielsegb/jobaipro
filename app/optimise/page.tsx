@@ -71,6 +71,7 @@ export default function OptimisePage() {
     if (typeof window !== "undefined") {
       const savedCV = localStorage.getItem("jobaipro_cv_draft");
       if (savedCV) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasDraft(true);
       }
     }

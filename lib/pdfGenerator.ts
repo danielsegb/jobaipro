@@ -135,6 +135,7 @@ export const generatePDF = async (
     import('html2canvas-pro'),
     import('jspdf'),
   ]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const html2canvas = h2cMod.default as any;
   const { jsPDF }   = jspdfMod;
 
