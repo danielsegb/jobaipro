@@ -1,6 +1,7 @@
 import * as React from "react";
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "../ui/Card";
+import Link from "next/link";
 
 export interface FeatureCardProps {
   icon: LucideIcon;
@@ -8,6 +9,7 @@ export interface FeatureCardProps {
   description: string;
   iconBgColor?: string;
   iconColor?: string;
+  href?: string;
 }
 
 export function FeatureCard({
@@ -16,10 +18,11 @@ export function FeatureCard({
   description,
   iconBgColor = "bg-blue-50",
   iconColor = "text-blue-600",
+  href,
 }: FeatureCardProps) {
-  return (
-    <Card className="border border-slate-100 hover:border-slate-200/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-      <CardContent className="p-6 sm:p-8 flex flex-col items-start gap-4">
+  const content = (
+    <Card className={`border border-slate-100 hover:border-slate-200/80 transition-all duration-300 w-full h-full ${href ? "hover:-translate-y-1 hover:shadow-md cursor-pointer" : ""}`}>
+      <CardContent className="p-6 sm:p-8 flex flex-col items-start gap-4 h-full">
         {/* Icon wrapper */}
         <div className={`w-12 h-12 rounded-xl ${iconBgColor} flex items-center justify-center`}>
           <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -33,4 +36,14 @@ export function FeatureCard({
       </CardContent>
     </Card>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="flex h-full w-full">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }

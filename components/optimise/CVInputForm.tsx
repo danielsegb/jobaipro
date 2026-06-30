@@ -7,12 +7,22 @@ export interface CVInputFormProps {
   cvText: string;
   setCvText: (text: string) => void;
   onNext: () => void;
+  title?: string;
+  description?: string;
+  buttonText?: string;
 }
 
 const SAMPLE_CV_TEXT = ``;
 
 
-export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
+export function CVInputForm({
+  cvText,
+  setCvText,
+  onNext,
+  title = "Step 1: Upload or paste your CV",
+  description = "Provide the current version of your CV to establish your background.",
+  buttonText = "Next: Target Job"
+}: CVInputFormProps) {
   const [dragActive, setDragActive] = React.useState(false);
   const [fileNotice, setFileNotice] = React.useState<{ type: "info" | "error"; message: string } | null>(null);
   const [isParsing, setIsParsing] = React.useState(false);
@@ -106,8 +116,8 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-slate-900">Step 1: Upload or paste your CV</h2>
-        <p className="text-sm text-slate-500 mt-1">Provide the current version of your CV to establish your background.</p>
+        <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+        <p className="text-sm text-slate-500 mt-1">{description}</p>
       </div>
 
       {/* Drag & Drop Upload Zone */}
@@ -187,7 +197,7 @@ export function CVInputForm({ cvText, setCvText, onNext }: CVInputFormProps) {
           onClick={onNext}
           className="px-8"
         >
-          Next: Target Job
+          {buttonText}
         </Button>
       </div>
     </div>

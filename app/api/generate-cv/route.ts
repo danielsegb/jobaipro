@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateContent } from "@/lib/gemini";
-import { buildCVOptimisationPrompt } from "@/lib/aiPrompts";
+import { buildCVOptimisationPrompt, buildCVReformatPrompt } from "@/lib/aiPrompts";
 import { parseRawCVText } from "@/lib/cvParser";
 
 function cleanJsonResponse(text: string): string {
@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
   try {
     const { cvText, jobDescription, jobTitle, companyName, industry } = await req.json();
 
-    if (!cvText || !jobDescription) {
+    if (!cvText) {
       return NextResponse.json(
-        { error: "CV text and Job Description are required." },
+        { error: "CV text is required." },
         { status: 400 }
       );
     }
@@ -31,7 +31,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ optimisedCV: parsed });
     }
 
-    const prompt = buildCVOptimisationPrompt(cvText, jobDescription, jobTitle, companyName, industry);
+    const prompt = jobDescription && jobDescription.trim()
+      ? buildCVOptimisationPrompt(cvText, jobDescription, jobTitle, companyName, industry)
+      : buildCVReformatPrompt(cvText, jobTitle, companyName, industry);
 
     try {
       const resultText = await generateContent(prompt, { jsonMode: true });

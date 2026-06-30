@@ -33,13 +33,13 @@ export function HeroSection() {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link href="/optimise" className="w-full sm:w-auto">
+            <Link href="/cv-optimiser" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto group shadow-md shadow-blue-600/10">
                 Optimise My CV
                 <ArrowRight className="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1" />
               </Button>
             </Link>
-            <Link href="/optimise?step=4" className="w-full sm:w-auto">
+            <Link href="/cv-optimiser" className="w-full sm:w-auto">
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 View Templates
               </Button>

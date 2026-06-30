@@ -208,3 +208,83 @@ INSTRUCTIONS:
 4. Return ONLY the rewritten text of the section. Do not include headings, introduction, or explanations. Just return the new content.
 `;
 }
+
+export function buildCVReformatPrompt(
+  cvText: string,
+  jobTitle?: string,
+  companyName?: string,
+  industry?: string
+): string {
+  return `You are an expert executive resume writer and career coach.
+Your task is to parse, clean up, and professionally structure the user's CV without tailoring it to any specific job.
+
+USER'S CURRENT CV:
+\"\"\"
+${cvText}
+\"\"\"
+
+INSTRUCTIONS:
+1. Parse, clean up, and structure the CV, using British English.
+2. IDENTIFY CANDIDATE'S NAME: Find the candidate's REAL full name from the contact block of the CV (typically located near the email address or phone number). NEVER use a document title (like "Resume", "CV", "Curriculum Vitae", "Software Engineer"), tagline, tagline header, or section heading as the name.
+3. SKILLS EXTRACTION: The "skills" array must consist of short noun phrases, specific tools, libraries, frameworks, languages, or core competencies ONLY (e.g., "TypeScript", "React", "Project Management", "Agile"). NEVER include full sentences, clause fragments, descriptions, or explanations. If a skill line reads like a sentence or contains a verb phrase, it is NOT a skill and must not be put in the skills array.
+4. IGNORE LAYOUT ARTIFACTS: Completely ignore and do not output any layout artifacts, page-break indicators (such as "Page Break" or "-----Page (N) Break-----"), footer markers, or separator dashes in any field.
+5. FIELD MAPPING: Rigorously map fields to their correct places:
+   - Do not put responsibility/achievement sentences or descriptions into "jobTitle".
+   - Do not put dates or extra text into the "skills" array.
+   - Map jobTitle, company, location, and dates accurately to their respective fields in the Experience and Education arrays.
+6. TRUTHFULNESS & ACCURACY: Keep all facts, dates, companies, qualifications, and achievements 100% TRUTHFUL to the original CV text. NEVER invent new employers, projects, degrees, dates, or certifications.
+7. Improve grammar, tone, action verbs, and structure.
+8. Convert responsibilities and achievements into bullet points that emphasize impact and measurable metrics (if mentioned).
+9. Output the result ONLY as a valid JSON object matching the JSON schema below. Do not wrap the JSON in markdown code blocks.
+
+JSON SCHEMA:
+{
+  "fullName": string,
+  "email": string,
+  "phone": string,
+  "location": string,
+  "linkedin": string,
+  "portfolio": string,
+  "professionalSummary": string,
+  "skills": string[],
+  "experience": [
+    {
+      "jobTitle": string,
+      "company": string,
+      "location": string,
+      "startDate": string,
+      "endDate": string,
+      "current": boolean,
+      "bullets": string[]
+    }
+  ],
+  "education": [
+    {
+      "degree": string,
+      "institution": string,
+      "location": string,
+      "startDate": string,
+      "endDate": string,
+      "current": boolean,
+      "bullets": string[]
+    }
+  ],
+  "projects": [
+    {
+      "name": string,
+      "description": string,
+      "bullets": string[]
+    }
+  ],
+  "certifications": [
+    {
+      "name": string,
+      "issuer": string,
+      "date": string
+    }
+  ],
+  "additionalSections": string
+}
+`;
+}
+

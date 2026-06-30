@@ -9,6 +9,7 @@ export interface AnalysisResultsProps {
   onGenerateCoverLetter: () => void;
   isGeneratingCV: boolean;
   isGeneratingCL: boolean;
+  hideActionButtons?: boolean;
 }
 
 export function AnalysisResults({
@@ -16,7 +17,8 @@ export function AnalysisResults({
   onOptimiseCV,
   onGenerateCoverLetter,
   isGeneratingCV,
-  isGeneratingCL
+  isGeneratingCL,
+  hideActionButtons = false
 }: AnalysisResultsProps) {
   
   const getScoreColor = (score: number) => {
@@ -226,36 +228,38 @@ export function AnalysisResults({
       </div>
 
       {/* Next Actions CTA */}
-      <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-1 text-center md:text-left">
-          <h4 className="text-base font-bold text-slate-900 flex items-center justify-center md:justify-start gap-2">
-            <FileCheck className="w-5 h-5 text-blue-600" />
-            Ready to generate your documents?
-          </h4>
-          <p className="text-sm text-slate-500">
-            Let our AI optimize your CV and generate a custom cover letter.
-          </p>
-        </div>
+      {!hideActionButtons && (
+        <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center md:text-left">
+            <h4 className="text-base font-bold text-slate-900 flex items-center justify-center md:justify-start gap-2">
+              <FileCheck className="w-5 h-5 text-blue-600" />
+              Ready to generate your documents?
+            </h4>
+            <p className="text-sm text-slate-500">
+              Let our AI optimize your CV and generate a custom cover letter.
+            </p>
+          </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <Button
-            onClick={onOptimiseCV}
-            isLoading={isGeneratingCV}
-            className="shadow-sm shadow-blue-600/10 flex-1 sm:flex-none"
-          >
-            Optimise My CV
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onGenerateCoverLetter}
-            isLoading={isGeneratingCL}
-            className="flex-1 sm:flex-none"
-          >
-            Generate Cover Letter
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <Button
+              onClick={onOptimiseCV}
+              isLoading={isGeneratingCV}
+              className="shadow-sm shadow-blue-600/10 flex-1 sm:flex-none"
+            >
+              Optimise My CV
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onGenerateCoverLetter}
+              isLoading={isGeneratingCL}
+              className="flex-1 sm:flex-none"
+            >
+              Generate Cover Letter
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

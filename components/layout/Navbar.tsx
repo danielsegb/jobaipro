@@ -17,26 +17,29 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500">
           <Link href="/" className="hover:text-slate-900 transition-colors">
             Home
           </Link>
-          <Link href="/optimise" className="hover:text-slate-900 transition-colors">
-            Optimise CV
+          <Link href="/cv-optimiser" className="hover:text-slate-900 transition-colors">
+            CV Optimizer
           </Link>
-          <Link href="/optimise?step=1" className="hover:text-slate-900 transition-colors">
-            Upload
+          <Link href="/cover-letter" className="hover:text-slate-900 transition-colors">
+            Cover Letter
+          </Link>
+          <Link href="/ats-checker" className="hover:text-slate-900 transition-colors">
+            ATS Checker
           </Link>
         </nav>
 
         {/* CTA Button */}
         <div className="flex items-center gap-4">
-          <Link href="/optimise">
+          <Link href="/cv-optimiser">
             <Button size="sm" className="hidden sm:inline-flex shadow-sm">
               Optimise My CV
             </Button>
           </Link>
-          <Link href="/optimise" className="sm:hidden">
+          <Link href="/cv-optimiser" className="sm:hidden">
             <Button size="sm">Optimise</Button>
           </Link>
         </div>

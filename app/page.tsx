@@ -26,6 +26,7 @@ export default function Home() {
       description: "Automatically align your resume with target job descriptions while retaining complete factual truthfulness.",
       iconBgColor: "bg-blue-50",
       iconColor: "text-blue-600",
+      href: "/cv-optimiser",
     },
     {
       icon: FileText,
@@ -33,6 +34,7 @@ export default function Home() {
       description: "Generate highly professional cover letters specifically written to link your experiences to the company's needs.",
       iconBgColor: "bg-indigo-50",
       iconColor: "text-indigo-600",
+      href: "/cover-letter",
     },
     {
       icon: Binary,
@@ -40,6 +42,7 @@ export default function Home() {
       description: "Compare your CV against job listings to see match score, missing keywords, and structural readiness ratings.",
       iconBgColor: "bg-emerald-50",
       iconColor: "text-emerald-600",
+      href: "/ats-checker",
     },
     {
       icon: Edit3,
@@ -47,6 +50,7 @@ export default function Home() {
       description: "Fine-tune details on the fly. Make custom edits to summary, skills, experience, and cover letter blocks in real-time.",
       iconBgColor: "bg-amber-50",
       iconColor: "text-amber-600",
+      href: "/cv-optimiser",
     },
     {
       icon: Layers,
@@ -54,6 +58,7 @@ export default function Home() {
       description: "Select from five bespoke document styles (Classic, Modern, Tech Minimal, Healthcare, Graduate) in one click.",
       iconBgColor: "bg-purple-50",
       iconColor: "text-purple-600",
+      href: "/cv-optimiser",
     },
     {
       icon: Download,
@@ -61,6 +66,7 @@ export default function Home() {
       description: "Export clean, perfectly typeset PDFs compatible with standard Applicant Tracking Systems.",
       iconBgColor: "bg-pink-50",
       iconColor: "text-pink-600",
+      href: "/cv-optimiser",
     },
   ];
 
@@ -93,6 +99,7 @@ export default function Home() {
                   description={feat.description}
                   iconBgColor={feat.iconBgColor}
                   iconColor={feat.iconColor}
+                  href={feat.href}
                 />
               ))}
             </div>

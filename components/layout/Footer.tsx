@@ -28,17 +28,17 @@ export function Footer() {
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Product</h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/optimise" className="text-slate-600 hover:text-blue-600 transition-colors">
+                <Link href="/cv-optimiser" className="text-slate-600 hover:text-blue-600 transition-colors">
                   CV Optimiser
                 </Link>
               </li>
               <li>
-                <Link href="/optimise" className="text-slate-600 hover:text-blue-600 transition-colors">
+                <Link href="/cover-letter" className="text-slate-600 hover:text-blue-600 transition-colors">
                   Cover Letter Generator
                 </Link>
               </li>
               <li>
-                <Link href="/optimise" className="text-slate-600 hover:text-blue-600 transition-colors">
+                <Link href="/ats-checker" className="text-slate-600 hover:text-blue-600 transition-colors">
                   ATS Checker
                 </Link>
               </li>
